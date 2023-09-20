@@ -16,6 +16,25 @@ releasesRouter.get("/", (req, res) => {
   });
 });
 
+// GET release by releaseId
+releasesRouter.get("/:releaseId", (req, res) => {
+  const releaseId = req.params.releaseId;
+  const query = 'SELECT * FROM `releases` WHERE releaseId = ?';
+
+  connection.query(query, [releaseId], (err, results, fields) => {
+    if (err) {
+      console.log(err);
+      res.status(500).json({ error: 'An error occurred' }); 
+    } else {
+      if (results.length > 0) {
+        res.json(results[0]);
+      } else {
+        res.status(404).json({ error: 'Release not found' });
+      }
+    }
+  });
+});
+
 // GET releases by artistId
 releasesRouter.get("/artist/:artistId", (req, res) => {
   const artistId = req.params.artistId;
