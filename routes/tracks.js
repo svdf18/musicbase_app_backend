@@ -69,8 +69,8 @@ tracksRouter.get("/release/:releaseId", (req, res) => {
   });
 });
 
-// GET search for tracks eg http://localhost:3333/tracks/search?q=
-tracksRouter.get("/search", (req, res) => {
+// GET search for tracks eg http://localhost:3333/tracks/search/query?q=
+tracksRouter.get("/search/query", (req, res) => {
     const query = req.query.q;
     const queryString = /*sql*/ `
     SELECT * 
