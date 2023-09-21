@@ -69,6 +69,25 @@ releasesRouter.get("/artist/:artistId", (req, res) => {
   });
 });
 
+// GET search for releases eg http://localhost:3333/releases/search?q=
+releasesRouter.get("/search", (req, res) => {
+    const query = req.query.q;
+    const queryString = /*sql*/ `
+    SELECT * 
+    FROM releases
+    WHERE releaseTitle LIKE ?
+    ORDER BY releaseTitle`;
+
+    const values = [`%${query}%`];
+    connection.query(queryString, values, (error, results) => {
+        if (error) {
+            console.log(error);
+        } else {
+            res.json(results);
+        }
+    });
+});
+
 // Create a new release and link it to an artist by artistId
 releasesRouter.post("/", (req, res) => {
   const { releaseTitle, releaseYear, label, artistId } = req.body;
@@ -151,6 +170,5 @@ releasesRouter.delete("/:releaseId", (req, res) => {
     });
   });
 });
-
 
 export { releasesRouter };
