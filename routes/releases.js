@@ -78,7 +78,6 @@ releasesRouter.post("/", (req, res) => {
     return res.status(400).json({ error: 'ReleaseTitle, ReleaseYear, Label, and ArtistId are required' });
   }
 
-  // Check if the artist with the specified artistId exists
   const checkArtistQuery = 'SELECT artistId FROM `artists` WHERE artistId = ?';
 
   connection.query(checkArtistQuery, [artistId], (checkArtistErr, checkArtistResults) => {
@@ -88,7 +87,6 @@ releasesRouter.post("/", (req, res) => {
     }
 
     if (checkArtistResults.length === 0) {
-      // Artist with the specified artistId does not exist
       return res.status(404).json({ error: 'Artist not found' });
     }
 
@@ -120,11 +118,10 @@ releasesRouter.post("/", (req, res) => {
 
 //---- DELETE HTTP ----//
 
-// Delete a release by releaseId
+// Delete a release by releaseId, including related data
 releasesRouter.delete("/:releaseId", (req, res) => {
   const releaseId = req.params.releaseId;
 
-  // Check if the release with the specified releaseId exists
   const checkQuery = 'SELECT releaseId FROM `releases` WHERE releaseId = ?';
 
   connection.query(checkQuery, [releaseId], (checkErr, checkResults) => {
@@ -134,23 +131,34 @@ releasesRouter.delete("/:releaseId", (req, res) => {
     }
 
     if (checkResults.length === 0) {
-      // Release with the specified releaseId does not exist
       return res.status(404).json({ error: 'Release not found' });
     }
 
-    // Delete the release from the database
-    const deleteQuery = 'DELETE FROM `releases` WHERE releaseId = ?';
+    // Delete related data in releaseTrack and artistRelease tables
+    const deleteRelatedDataQuery = `
+      DELETE FROM releaseTrack WHERE releaseId = ?;
+      DELETE FROM artistRelease WHERE releaseId = ?;
+    `;
 
-    connection.query(deleteQuery, [releaseId], (deleteErr, deleteResult) => {
+    connection.query(deleteRelatedDataQuery, [releaseId, releaseId], (deleteErr, deleteResult) => {
       if (deleteErr) {
         console.log(deleteErr);
-        res.status(500).json({ error: 'An error occurred while deleting the release' });
+        res.status(500).json({ error: 'An error occurred while deleting related data' });
       } else {
-        res.status(200).json({ message: 'Release deleted successfully' });
+
+        const deleteReleaseQuery = 'DELETE FROM `releases` WHERE releaseId = ?';
+
+        connection.query(deleteReleaseQuery, [releaseId], (deleteReleaseErr, deleteReleaseResult) => {
+          if (deleteReleaseErr) {
+            console.log(deleteReleaseErr);
+            res.status(500).json({ error: 'An error occurred while deleting the release' });
+          } else {
+            res.status(200).json({ message: 'Release and related data deleted successfully' });
+          }
+        });
       }
     });
   });
 });
-
 
 export { releasesRouter };

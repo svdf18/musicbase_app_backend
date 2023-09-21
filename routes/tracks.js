@@ -70,8 +70,7 @@ tracksRouter.get("/release/:releaseId", (req, res) => {
 });
 
 //----POST HTTP----//
-
-// Create a new track and link it to an artist by releaseId !!!! PROBLEMS W ARTISTID I ARTISTRELEASE !!!!
+// Create a new track and link it to an artist by releaseId
 tracksRouter.post("/", (req, res) => {
   const { trackTitle, releaseId } = req.body;
 
@@ -96,7 +95,7 @@ tracksRouter.post("/", (req, res) => {
 
     // Create a new track in the tracks table
     const insertTrackQuery = 'INSERT INTO `tracks` (trackTitle) VALUES (?)';
-    
+
     connection.query(insertTrackQuery, [trackTitle], (insertTrackErr, trackResult) => {
       if (insertTrackErr) {
         console.log(insertTrackErr);
@@ -105,26 +104,26 @@ tracksRouter.post("/", (req, res) => {
 
       const newTrackId = trackResult.insertId;
 
-      // Link the track to the artist based on the shared releaseId in the artistRelease table
-      const linkArtistReleaseQuery = 'INSERT INTO `artistRelease` (artistId, releaseId) SELECT artistId, ? FROM `releaseTrack` WHERE trackId = ?';
+      // Link the track to the release based on the provided releaseId
+      const linkReleaseTrackQuery = 'INSERT INTO `releaseTrack` (releaseId, trackId) VALUES (?, ?)';
       
-      connection.query(linkArtistReleaseQuery, [releaseId, newTrackId], (linkErr, linkResult) => {
+      connection.query(linkReleaseTrackQuery, [releaseId, newTrackId], (linkErr, linkResult) => {
         if (linkErr) {
           console.log(linkErr);
-          return res.status(500).json({ error: 'An error occurred while linking the track and artist' });
+          return res.status(500).json({ error: 'An error occurred while linking the track and release' });
         }
 
-        res.status(201).json({ trackId: newTrackId, message: 'Track created and linked to artist successfully' });
+        res.status(201).json({ trackId: newTrackId, message: 'Track created and linked to release successfully' });
       });
     });
   });
 });
 
-// Delete a track by trackId
+
+// Delete a track by trackId, including related data
 tracksRouter.delete("/:trackId", (req, res) => {
   const trackId = req.params.trackId;
 
-  // Check if the track with the specified trackId exists
   const checkQuery = 'SELECT trackId FROM `tracks` WHERE trackId = ?';
 
   connection.query(checkQuery, [trackId], (checkErr, checkResults) => {
@@ -134,19 +133,31 @@ tracksRouter.delete("/:trackId", (req, res) => {
     }
 
     if (checkResults.length === 0) {
-      // Track with the specified trackId does not exist
       return res.status(404).json({ error: 'Track not found' });
     }
 
-    // Delete the track from the database
-    const deleteQuery = 'DELETE FROM `tracks` WHERE trackId = ?';
+    // Delete related data in releaseTrack and artistTrack tables
+    const deleteRelatedDataQuery = `
+      DELETE FROM releaseTrack WHERE trackId = ?;
+      DELETE FROM artistTrack WHERE trackId = ?;
+    `;
 
-    connection.query(deleteQuery, [trackId], (deleteErr, deleteResult) => {
+    connection.query(deleteRelatedDataQuery, [trackId, trackId], (deleteErr, deleteResult) => {
       if (deleteErr) {
         console.log(deleteErr);
-        res.status(500).json({ error: 'An error occurred while deleting the track' });
+        res.status(500).json({ error: 'An error occurred while deleting related data' });
       } else {
-        res.status(200).json({ message: 'Track deleted successfully' });
+
+        const deleteTrackQuery = 'DELETE FROM `tracks` WHERE trackId = ?';
+
+        connection.query(deleteTrackQuery, [trackId], (deleteTrackErr, deleteTrackResult) => {
+          if (deleteTrackErr) {
+            console.log(deleteTrackErr);
+            res.status(500).json({ error: 'An error occurred while deleting the track' });
+          } else {
+            res.status(200).json({ message: 'Track and related data deleted successfully' });
+          }
+        });
       }
     });
   });

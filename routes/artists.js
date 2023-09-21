@@ -134,7 +134,7 @@ artistsRouter.post("/", (req, res) => {
 
 //---- DELETE HTTP ----//
 
-// Delete an artist by artistId
+// Delete an artist by artistId, including related data
 artistsRouter.delete("/:artistId", (req, res) => {
   const artistId = req.params.artistId;
 
@@ -152,15 +152,28 @@ artistsRouter.delete("/:artistId", (req, res) => {
       return res.status(404).json({ error: 'Artist not found' });
     }
 
-    // Delete the artist from the database
-    const deleteQuery = 'DELETE FROM `artists` WHERE artistId = ?';
+    // Delete the artist from the related tables (artistRelease, artistTrack, releaseTrack)
+    const deleteRelatedDataQuery = `
+      DELETE FROM artistRelease WHERE artistId = ?;
+      DELETE FROM artistTrack WHERE artistId = ?;
+    `;
 
-    connection.query(deleteQuery, [artistId], (deleteErr, deleteResult) => {
+    connection.query(deleteRelatedDataQuery, [artistId, artistId], (deleteErr, deleteResult) => {
       if (deleteErr) {
         console.log(deleteErr);
-        res.status(500).json({ error: 'An error occurred while deleting the artist' });
+        res.status(500).json({ error: 'An error occurred while deleting related data' });
       } else {
-        res.status(200).json({ message: 'Artist deleted successfully' });
+        // Now that related data is deleted, delete the artist from the artists table
+        const deleteArtistQuery = 'DELETE FROM `artists` WHERE artistId = ?';
+
+        connection.query(deleteArtistQuery, [artistId], (deleteArtistErr, deleteArtistResult) => {
+          if (deleteArtistErr) {
+            console.log(deleteArtistErr);
+            res.status(500).json({ error: 'An error occurred while deleting the artist' });
+          } else {
+            res.status(200).json({ message: 'Artist and related data deleted successfully' });
+          }
+        });
       }
     });
   });
