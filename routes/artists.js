@@ -81,6 +81,7 @@ artistsRouter.get("/search", (req, res) => {
             res.json(results);
         }
     });
+});
 
 // GET featuring releases by artistId
 artistsRouter.get("/featuring-releases/:artistId", (req, res) => {
