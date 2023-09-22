@@ -128,6 +128,32 @@ releasesRouter.get("/export/:releaseId", (req, res) => {
 
 //---- CREATE HTTP ----//
 
+// GET search for releases eg http://localhost:3333/releases/search/query?q=
+releasesRouter.get("/search/query", (req, res) => {
+  const query = req.query.q;
+  const queryString = /*sql*/ `
+    SELECT * 
+    FROM releases
+    WHERE releaseTitle LIKE ?
+    ORDER BY releaseTitle`;
+
+  const values = [`%${query}%`];
+  
+  connection.query(queryString, values, (error, results) => {
+    if (error) {
+      console.error(error);
+
+      res.status(500).json({ 
+        error: 'An error occurred while searching for releases', 
+        details: error.message
+      });
+    } else {
+      res.json(results);
+    }
+  });
+});
+
+
 // Create a new release and link it to an artist by artistId
 releasesRouter.post("/", (req, res) => {
   const { releaseTitle, releaseYear, label, artistId } = req.body;

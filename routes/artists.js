@@ -65,6 +65,27 @@ artistsRouter.get("/tracks/:artistId", (req, res) => {
   });
 });
 
+// GET search for artists eg http://localhost:3333/artists/search/query?q=
+artistsRouter.get("/search/query", (req, res) => {
+    const queryString = req.query.q;
+    const query = /*sql*/ `
+      SELECT * 
+      FROM artists
+      WHERE artistName LIKE ?
+      ORDER BY artistName`;
+
+    const values = [`%${queryString}%`];
+    connection.query(query, values, (error, results) => {
+        if (error) {
+            console.error(error);
+            res.status(500).json({ error: 'An error occurred while searching for artists' });
+        } else {
+            res.json(results);
+        }
+    });
+});
+
+
 // GET tracks where artist w. artistId = ? is featuring
 artistsRouter.get("/featuring-releases/:artistId", (req, res) => {
   const artistId = req.params.artistId;
