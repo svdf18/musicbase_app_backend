@@ -35,4 +35,4 @@ npm start
 
 - [Deployed Frontend](frontend-deployment-link)
 
-- ![PDF File](https://github.com/svdf18/musicbase_app_backend/raw/main/ER-diagram.pdf)
+- ![ER-diagram](https://github.com/svdf18/musicbase_app_backend/raw/main/ER-diagram.pdf)
