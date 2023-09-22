@@ -2,7 +2,7 @@ import mysql from "mysql2";
 import "dotenv/config";
 import fs from "fs/promises";
 
-const dbConfig = {
+const dbConfig ={
   host: process.env.MYSQL_HOST,
   port: process.env.MYSQL_PORT,
   user: process.env.MYSQL_USER,
