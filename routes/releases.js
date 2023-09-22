@@ -126,8 +126,6 @@ releasesRouter.get("/export/:releaseId", (req, res) => {
   });
 });
 
-//---- CREATE HTTP ----//
-
 // GET search for releases eg http://localhost:3333/releases/search/query?q=
 releasesRouter.get("/search/query", (req, res) => {
   const query = req.query.q;
@@ -153,6 +151,7 @@ releasesRouter.get("/search/query", (req, res) => {
   });
 });
 
+//---- CREATE HTTP ----//
 
 // Create a new release and link it to an artist by artistId
 releasesRouter.post("/", (req, res) => {
