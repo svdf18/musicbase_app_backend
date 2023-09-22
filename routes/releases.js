@@ -69,11 +69,68 @@ releasesRouter.get("/artist/:artistId", (req, res) => {
   });
 });
 
+//Get release info for export
+releasesRouter.get("/export/:releaseId", (req, res) => {
+  const releaseId = req.params.releaseId;
+
+  const query = /*sql*/`
+    SELECT 
+      a.artistName,
+      a.realName,
+      a.city,
+      a.activeSince,
+      r.releaseTitle,
+      r.releaseYear,
+      r.label,
+      t.trackTitle
+    FROM releases r
+    INNER JOIN artistRelease ar ON r.releaseId = ar.releaseId
+    INNER JOIN artists a ON ar.artistId = a.artistId
+    INNER JOIN releaseTrack rt ON r.releaseId = rt.releaseId
+    INNER JOIN tracks t ON rt.trackId = t.trackId
+    WHERE r.releaseId = ?
+  `;
+
+  connection.query(query, [releaseId], (err, results, fields) => {
+    if (err) {
+      console.log(err);
+      res.status(500).json({ error: 'An error occurred' }); 
+    } else {
+      if (results.length > 0) {
+        // Create an object to store the structured data
+        const output = {
+          artist: {
+            artistName: results[0].artistName,
+            realName: results[0].realName,
+            city: results[0].city,
+            activeSince: results[0].activeSince
+          },
+          release: {
+            releaseTitle: results[0].releaseTitle,
+            releaseYear: results[0].releaseYear,
+            label: results[0].label
+          },
+          tracks: []
+        };
+
+        // Populate the tracks array
+        results.forEach((row) => {
+          output.tracks.push({ trackTitle: row.trackTitle });
+        });
+
+        res.json(output);
+      } else {
+        res.status(404).json({ error: 'Release not found' });
+      }
+    }
+  });
+});
+
+
 // Create a new release and link it to an artist by artistId
 releasesRouter.post("/", (req, res) => {
   const { releaseTitle, releaseYear, label, artistId } = req.body;
 
-  // Check if required fields are provided
   if (!releaseTitle || !releaseYear || !label || !artistId) {
     return res.status(400).json({ error: 'ReleaseTitle, ReleaseYear, Label, and ArtistId are required' });
   }

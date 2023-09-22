@@ -74,12 +74,10 @@ tracksRouter.get("/release/:releaseId", (req, res) => {
 tracksRouter.post("/", (req, res) => {
   const { trackTitle, releaseId } = req.body;
 
-  // Check if required fields are provided
   if (!trackTitle || !releaseId) {
     return res.status(400).json({ error: 'TrackTitle and ReleaseId are required' });
   }
 
-  // Check if the release with the specified releaseId exists
   const checkReleaseQuery = 'SELECT releaseId FROM `releases` WHERE releaseId = ?';
 
   connection.query(checkReleaseQuery, [releaseId], (checkReleaseErr, checkReleaseResults) => {
@@ -89,11 +87,10 @@ tracksRouter.post("/", (req, res) => {
     }
 
     if (checkReleaseResults.length === 0) {
-      // Release with the specified releaseId does not exist
       return res.status(404).json({ error: 'Release not found' });
     }
 
-    // Create a new track in the tracks table
+    // Create a new track in the tracks tableç
     const insertTrackQuery = 'INSERT INTO `tracks` (trackTitle) VALUES (?)';
 
     connection.query(insertTrackQuery, [trackTitle], (insertTrackErr, trackResult) => {

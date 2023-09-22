@@ -8,6 +8,7 @@ const artistsRouter = Router();
 // GET all artists
 artistsRouter.get("/", (req, res) => {
   const query = 'SELECT * FROM `artists` ORDER BY `artistName`';
+
   connection.query(query, (err, results, fields) => {
     if (err) {
       console.log(err);
@@ -64,33 +65,34 @@ artistsRouter.get("/tracks/:artistId", (req, res) => {
   });
 });
 
-// GET featuring releases by artistId
+// GET tracks where artist w. artistId = ? is featuring
 artistsRouter.get("/featuring-releases/:artistId", (req, res) => {
   const artistId = req.params.artistId;
   const query = /*sql*/ `
     SELECT 
+      t.trackTitle,
       r.releaseTitle,
       r.releaseYear,
-      r.label,
-      a.artistName AS primaryArtist
+      r.label
     FROM releaseTrack rt
     INNER JOIN releases r ON rt.releaseId = r.releaseId
     INNER JOIN tracks t ON rt.trackId = t.trackId
     INNER JOIN artistTrack at ON t.trackId = at.trackId
     INNER JOIN artists a ON at.artistId = a.artistId
-    WHERE a.artistId = ? AND t.artistRole = 'FEATURING ARTIST'
+    WHERE a.artistId = ? AND t.trackTitle LIKE CONCAT('%', a.artistName, '%')
     ORDER BY r.releaseYear DESC;
   `;
 
   connection.query(query, [artistId], (err, results, fields) => {
     if (err) {
       console.log(err);
-      res.status(500).json({ error: 'An error occurred' }); 
+      res.status(500).json({ error: 'An error occurred' });
     } else {
-      res.json(results); 
+      res.json(results);
     }
   });
 });
+
 
 //---- POST HTTP ----//
 
@@ -98,7 +100,6 @@ artistsRouter.get("/featuring-releases/:artistId", (req, res) => {
 artistsRouter.post("/", (req, res) => {
   const { artistName, realName, city, activeSince } = req.body;
 
-  // Check if required fields are provided
   if (!artistName) {
     return res.status(400).json({ error: 'ArtistName is required' });
   }
@@ -113,7 +114,6 @@ artistsRouter.post("/", (req, res) => {
     }
 
     if (checkResults.length > 0) {
-      // ArtistName already exists
       return res.status(400).json({ error: 'ArtistName already exists' });
     }
 
@@ -138,7 +138,6 @@ artistsRouter.post("/", (req, res) => {
 artistsRouter.delete("/:artistId", (req, res) => {
   const artistId = req.params.artistId;
 
-  // Check if the artist with the specified artistId exists
   const checkQuery = 'SELECT artistId FROM `artists` WHERE artistId = ?';
 
   connection.query(checkQuery, [artistId], (checkErr, checkResults) => {
@@ -148,11 +147,10 @@ artistsRouter.delete("/:artistId", (req, res) => {
     }
 
     if (checkResults.length === 0) {
-      // Artist with the specified artistId does not exist
       return res.status(404).json({ error: 'Artist not found' });
     }
 
-    // Delete the artist from the related tables (artistRelease, artistTrack, releaseTrack)
+    // Delete the artist from the related tables (artistRelease, artistTrack)
     const deleteRelatedDataQuery = `
       DELETE FROM artistRelease WHERE artistId = ?;
       DELETE FROM artistTrack WHERE artistId = ?;
@@ -163,7 +161,6 @@ artistsRouter.delete("/:artistId", (req, res) => {
         console.log(deleteErr);
         res.status(500).json({ error: 'An error occurred while deleting related data' });
       } else {
-        // Now that related data is deleted, delete the artist from the artists table
         const deleteArtistQuery = 'DELETE FROM `artists` WHERE artistId = ?';
 
         connection.query(deleteArtistQuery, [artistId], (deleteArtistErr, deleteArtistResult) => {
