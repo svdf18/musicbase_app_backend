@@ -1,0 +1,38 @@
+# Musicbase Backend
+
+## Installation
+
+1. Download or clone this repository:
+- [Backend Repository](https://github.com/svdf18/musicbase_app_backend)
+
+2. Navigate to the project directory:
+
+```
+cd /musicbase_app_backend
+```
+3. Install the required npm packages:
+
+```
+npm install
+```
+
+This will install the following dependencies and their versions specified in the package.json file:
+
+    cors v2.8.5
+    dotenv v16.3.1
+    express v4.18.2
+    mysql2 v3.6.1
+
+4. Start the server with the following command:
+```
+npm start
+```
+
+
+## Links
+
+- [Deployed Backend](backend-deployment-link)
+
+- [Deployed Frontend](frontend-deployment-link)
+
+![PDF File](https://github.com/svdf18/musicbase_app_backend/raw/main/ER-diagram.pdf)
