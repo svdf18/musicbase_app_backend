@@ -1,4 +1,4 @@
-import mysql2 from "mysql2";
+import mysql from "mysql2";
 import "dotenv/config";
 import fs from "fs/promises";
 
@@ -15,6 +15,6 @@ if (process.env.MYSQL_CERT) {
   dbConfig.ssl = { ca: await fs.readFile("DigiCertGlobalRootCA.crt.pem") };
 }
 
-const dbConnection = mysql2.createConnection(dbConfig);
+const dbConnection = mysql.createConnection(dbConfig);
 
 export default dbConnection;
