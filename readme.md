@@ -29,10 +29,10 @@ npm start
 ```
 
 
-## Links (husk at opdatere links)
+## Links
 
-- [Deployed Backend](backend-deployment-link)
+- [Deployed Backend](https://musicbase-app-backend.azurewebsites.net/)
 
 - [Deployed Frontend](https://svdf18.github.io/musicbase_app_frontend/)
 
-- ![ER-diagram](https://github.com/svdf18/musicbase_app_backend/blob/main_production/ER-diagram.pdf)
+- [ER-diagram](https://github.com/svdf18/musicbase_app_backend/blob/main_production/ER-diagram.pdf)
