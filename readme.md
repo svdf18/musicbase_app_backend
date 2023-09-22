@@ -3,7 +3,7 @@
 ## Installation
 
 1. Download or clone this repository:
-- [Backend Repository](https://github.com/svdf18/musicbase_app_backend)
+- [Backend Repository](https://github.com/svdf18/musicbase_app_backend/tree/main_production)
 
 2. Navigate to the project directory:
 
@@ -33,6 +33,6 @@ npm start
 
 - [Deployed Backend](backend-deployment-link)
 
-- [Deployed Frontend](frontend-deployment-link)
+- [Deployed Frontend](https://svdf18.github.io/musicbase_app_frontend/)
 
-- ![ER-diagram](https://github.com/svdf18/musicbase_app_backend/raw/main/ER-diagram.pdf)
+- ![ER-diagram](https://github.com/svdf18/musicbase_app_backend/blob/main_production/ER-diagram.pdf)
