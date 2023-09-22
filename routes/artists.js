@@ -132,6 +132,44 @@ artistsRouter.post("/", (req, res) => {
   });
 });
 
+//---- PUT HTTP ----//
+
+// Update an existing artist
+artistsRouter.put("/:artistId", (req, res) => {
+  const artistId = req.params.artistId;
+  const { artistName, realName, city, activeSince } = req.body;
+
+  if (!artistName) {
+    return res.status(400).json({ error: 'ArtistName is required' });
+  }
+
+  // Check if the artistName already exists in the database, excluding the current artist
+  const checkQuery = 'SELECT artistId FROM `artists` WHERE artistName = ? AND artistId != ?';
+
+  connection.query(checkQuery, [artistName, artistId], (checkErr, checkResults) => {
+    if (checkErr) {
+      console.log(checkErr);
+      return res.status(500).json({ error: 'An error occurred while checking artistName' });
+    }
+
+    if (checkResults.length > 0) {
+      return res.status(400).json({ error: 'ArtistName already exists' });
+    }
+
+    // Update the existing artist in the database
+    const updateQuery = 'UPDATE `artists` SET artistName = ?, realName = ?, city = ?, activeSince = ? WHERE artistId = ?';
+    
+    connection.query(updateQuery, [artistName, realName, city, activeSince, artistId], (updateErr, result) => {
+      if (updateErr) {
+        console.log(updateErr);
+        res.status(500).json({ error: 'An error occurred while updating the artist' });
+      } else {
+        res.status(200).json({ artistId, message: 'Artist updated successfully' });
+      }
+    });
+  });
+});
+
 //---- DELETE HTTP ----//
 
 // Delete an artist by artistId, including related data

@@ -126,6 +126,7 @@ releasesRouter.get("/export/:releaseId", (req, res) => {
   });
 });
 
+//---- CREATE HTTP ----//
 
 // Create a new release and link it to an artist by artistId
 releasesRouter.post("/", (req, res) => {
@@ -172,6 +173,150 @@ releasesRouter.post("/", (req, res) => {
     });
   });
 });
+
+// POST route to create a complete album with artist and tracks
+releasesRouter.post("/create-release", (req, res) => {
+  const { artistName, realName, city, activeSince, releaseInfo } = req.body;
+
+  if (!artistName || !releaseInfo || !Array.isArray(releaseInfo) || releaseInfo.length === 0) {
+    return res.status(400).json({ error: 'Invalid request body' });
+  }
+
+  // Check if the artist exists in the database by artistName
+  const checkArtistQuery = 'SELECT artistId FROM `artists` WHERE artistName = ?';
+
+  connection.query(checkArtistQuery, [artistName], (checkArtistErr, checkArtistResults) => {
+    if (checkArtistErr) {
+      console.log(checkArtistErr);
+      return res.status(500).json({ error: 'An error occurred while checking the artist' });
+    }
+
+    let artistId;
+
+    // If the artist exists, use the existing artistId
+    if (checkArtistResults.length > 0) {
+      artistId = checkArtistResults[0].artistId;
+    } else {
+      // If the artist doesn't exist, create a new artist
+      const insertArtistQuery = 'INSERT INTO `artists` (artistName, realName, city, activeSince) VALUES (?, ?, ?, ?)';
+      connection.query(insertArtistQuery, [artistName, realName, city, activeSince], (insertArtistErr, artistResult) => {
+        if (insertArtistErr) {
+          console.log(insertArtistErr);
+          return res.status(500).json({ error: 'An error occurred while creating the artist' });
+        }
+        artistId = artistResult.insertId;
+      });
+    }
+
+    // Iterate through each release in the releaseInfo array
+    const trackInsertPromises = releaseInfo.map(release => {
+      const { releaseTitle, releaseYear, label, tracks } = release;
+
+      return new Promise((resolve, reject) => {
+        // Create a new release in the releases table
+        const insertReleaseQuery = 'INSERT INTO `releases` (releaseTitle, releaseYear, label) VALUES (?, ?, ?)';
+        connection.query(insertReleaseQuery, [releaseTitle, releaseYear, label], (insertReleaseErr, releaseResult) => {
+          if (insertReleaseErr) {
+            console.log(insertReleaseErr);
+            reject('An error occurred while creating the release');
+          }
+          const releaseId = releaseResult.insertId;
+
+          // Iterate through each track in the tracks array
+          const trackInsertPromises = tracks.map(track => {
+            return new Promise((resolveTrack, rejectTrack) => {
+              const { trackTitle } = track;
+
+              // Create a new track in the tracks table
+              const insertTrackQuery = 'INSERT INTO `tracks` (trackTitle) VALUES (?)';
+              connection.query(insertTrackQuery, [trackTitle], (insertTrackErr, trackResult) => {
+                if (insertTrackErr) {
+                  console.log(insertTrackErr);
+                  rejectTrack('An error occurred while creating the track');
+                }
+                const trackId = trackResult.insertId;
+
+                // Link the track to the release
+                const linkReleaseTrackQuery = 'INSERT INTO `releaseTrack` (releaseId, trackId) VALUES (?, ?)';
+                connection.query(linkReleaseTrackQuery, [releaseId, trackId], (linkErr, linkResult) => {
+                  if (linkErr) {
+                    console.log(linkErr);
+                    rejectTrack('An error occurred while linking the track and release');
+                  }
+                  resolveTrack();
+                });
+              });
+            });
+          });
+
+          // Wait for all track insertions to complete
+          Promise.all(trackInsertPromises)
+            .then(() => {
+              // Link the artist to the release in the artistRelease table
+              const linkArtistReleaseQuery = 'INSERT INTO `artistRelease` (artistId, releaseId) VALUES (?, ?)';
+              connection.query(linkArtistReleaseQuery, [artistId, releaseId], (linkErr, linkResult) => {
+                if (linkErr) {
+                  console.log(linkErr);
+                  reject('An error occurred while linking the artist and release');
+                }
+                resolve();
+              });
+            })
+            .catch(err => reject(err));
+        });
+      });
+    });
+
+    // Wait for all release insertions to complete
+    Promise.all(trackInsertPromises)
+      .then(() => {
+        res.status(201).json({ message: 'Album created successfully' });
+      })
+      .catch(err => {
+        console.log(err);
+        res.status(500).json({ error: err });
+      });
+  });
+});
+
+//---- PUT HTTP ----//
+
+// Update an existing release by releaseId
+releasesRouter.put("/:releaseId", (req, res) => {
+  const releaseId = req.params.releaseId;
+  const { releaseTitle, releaseYear, label } = req.body;
+
+  if (!releaseTitle || !releaseYear || !label) {
+    return res.status(400).json({ error: 'ReleaseTitle, ReleaseYear, and Label are required' });
+  }
+
+  // Check if the release with the specified releaseId exists
+  const checkReleaseQuery = 'SELECT releaseId FROM `releases` WHERE releaseId = ?';
+
+  connection.query(checkReleaseQuery, [releaseId], (checkReleaseErr, checkReleaseResults) => {
+    if (checkReleaseErr) {
+      console.log(checkReleaseErr);
+      return res.status(500).json({ error: 'An error occurred while checking the release' });
+    }
+
+    if (checkReleaseResults.length === 0) {
+      return res.status(404).json({ error: 'Release not found' });
+    }
+
+    // Update the existing release in the releases table
+    const updateReleaseQuery = 'UPDATE `releases` SET releaseTitle = ?, releaseYear = ?, label = ? WHERE releaseId = ?';
+    
+    connection.query(updateReleaseQuery, [releaseTitle, releaseYear, label, releaseId], (updateReleaseErr, result) => {
+      if (updateReleaseErr) {
+        console.log(updateReleaseErr);
+        res.status(500).json({ error: 'An error occurred while updating the release' });
+      } else {
+        res.status(200).json({ releaseId, message: 'Release updated successfully' });
+      }
+    });
+  });
+});
+
 
 //---- DELETE HTTP ----//
 

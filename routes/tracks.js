@@ -116,6 +116,44 @@ tracksRouter.post("/", (req, res) => {
   });
 });
 
+//---- PUT HTTP ----//
+// Update an existing track by trackId
+tracksRouter.put("/:trackId", (req, res) => {
+  const trackId = req.params.trackId;
+  const { trackTitle } = req.body;
+
+  if (!trackTitle) {
+    return res.status(400).json({ error: 'TrackTitle is required' });
+  }
+
+  // Check if the track with the specified trackId exists
+  const checkTrackQuery = 'SELECT trackId FROM `tracks` WHERE trackId = ?';
+
+  connection.query(checkTrackQuery, [trackId], (checkTrackErr, checkTrackResults) => {
+    if (checkTrackErr) {
+      console.log(checkTrackErr);
+      return res.status(500).json({ error: 'An error occurred while checking the track' });
+    }
+
+    if (checkTrackResults.length === 0) {
+      return res.status(404).json({ error: 'Track not found' });
+    }
+
+    // Update the existing track in the tracks table
+    const updateTrackQuery = 'UPDATE `tracks` SET trackTitle = ? WHERE trackId = ?';
+    
+    connection.query(updateTrackQuery, [trackTitle, trackId], (updateTrackErr, result) => {
+      if (updateTrackErr) {
+        console.log(updateTrackErr);
+        res.status(500).json({ error: 'An error occurred while updating the track' });
+      } else {
+        res.status(200).json({ trackId, message: 'Track updated successfully' });
+      }
+    });
+  });
+});
+
+//---- DELETE HTTP ----//
 
 // Delete a track by trackId, including related data
 tracksRouter.delete("/:trackId", (req, res) => {
