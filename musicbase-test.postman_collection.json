@@ -1,0 +1,290 @@
+{
+	"info": {
+		"_postman_id": "e562a1a2-95a9-4720-8901-ed558a59065d",
+		"name": "musicbase-test",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "29402914",
+		"_collection_link": "https://universal-rocket-506506.postman.co/workspace/My-Workspace~07048a1e-eb5a-4e8c-8737-50f1aff0c266/collection/29402914-e562a1a2-95a9-4720-8901-ed558a59065d?action=share&source=collection_link&creator=29402914"
+	},
+	"item": [
+		{
+			"name": "getallartists",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "http://localhost:3333/artists"
+			},
+			"response": []
+		},
+		{
+			"name": "get-artist-by-artistId",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "http://localhost:3333/artists/2"
+			},
+			"response": []
+		},
+		{
+			"name": "get-featuring-releases-by-artistId",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "http://localhost:3333/artists/featuring-releases/2"
+			},
+			"response": []
+		},
+		{
+			"name": "getallreleases",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "http://localhost:3333/releases"
+			},
+			"response": []
+		},
+		{
+			"name": "get-release-by-releaseId",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "http://localhost:3333/releases/17"
+			},
+			"response": []
+		},
+		{
+			"name": "get-releases-by-artistId",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "http://localhost:3333/releases/artist/1"
+			},
+			"response": []
+		},
+		{
+			"name": "get-all-info-about-a-release-by-releaseId",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "http://localhost:3333/releases/export/10"
+			},
+			"response": []
+		},
+		{
+			"name": "getalltracks",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "http://localhost:3333/tracks"
+			},
+			"response": []
+		},
+		{
+			"name": "get-tracks-by-releaseId",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "http://localhost:3333/tracks/release/24"
+			},
+			"response": []
+		},
+		{
+			"name": "get-tracks-by-artistId",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "http://localhost:3333/artists/tracks/"
+			},
+			"response": []
+		},
+		{
+			"name": "get-track-by-trackId",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "http://localhost:3333/tracks/20"
+			},
+			"response": []
+		},
+		{
+			"name": "post-new-artist",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "    {\n        \"artistName\": \"Addison Grooveee\",\n        \"realName\": \"Antony Williams\",\n        \"city\": \"Bristol\",\n        \"activeSince\": \"2000s\"\n    }",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://localhost:3333/artists/"
+			},
+			"response": []
+		},
+		{
+			"name": "update-artist-by-artistId",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "    {\n        \"artistName\": \"Addi Groovy\",\n        \"realName\": \"Antony Williams\",\n        \"city\": \"Bristol\",\n        \"activeSince\": \"2000s\"\n    }",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://localhost:3333/artists/25"
+			},
+			"response": []
+		},
+		{
+			"name": "delete-artist-by-artistId",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": "http://localhost:3333/artists/22"
+			},
+			"response": []
+		},
+		{
+			"name": "post-new-release-w-artistId",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "    {\n        \"releaseTitle\": \"AAAaa Battery\",\n        \"releaseYear\": 2023,\n        \"label\": \"Bristol Rec\",\n        \"artistId\": 23\n    }",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://localhost:3333/releases"
+			},
+			"response": []
+		},
+		{
+			"name": "post-complete-release",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"artistName\": \"Oneohtrix Point Never\",\n  \"realName\": \"Real Name\",\n  \"city\": \"City\",\n  \"activeSince\": \"Year\",\n  \"releaseInfo\": [\n    {\n      \"releaseTitle\": \"Releasss Titl dd4\",\n      \"releaseYear\": 2023,\n      \"label\": \"Label 1\",\n      \"tracks\": [\n        {\n          \"trackTitle\": \"s d5\"\n        },\n        {\n          \"trackTitle\": \"Track d\"\n        }\n      ]\n    }\n  ]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://localhost:3333/releases/create-release"
+			},
+			"response": []
+		},
+		{
+			"name": "update-release-by-releaseId",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "    {\n        \"releaseTitle\": \"aaBBss Battery\",\n        \"releaseYear\": 2023,\n        \"label\": \"Bristol Rec\",\n        \"artistId\": 25\n    }",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://localhost:3333/releases/24"
+			},
+			"response": []
+		},
+		{
+			"name": "delete-release-by-releaseId",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": "http://localhost:3333/releases/21"
+			},
+			"response": []
+		},
+		{
+			"name": "post-new-track-w-releaseId",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "    {\n        \"trackTitle\": \"BBB Battery\",\n        \"releaseId\": 24\n    }",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://localhost:3333/tracks"
+			},
+			"response": []
+		},
+		{
+			"name": "delete-track-by-trackId",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": "http://localhost:3333/tracks/202"
+			},
+			"response": []
+		},
+		{
+			"name": "update-track-by-trackId",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "    {\n        \"trackTitle\": \"Battery\"\n    }",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://localhost:3333/tracks/203"
+			},
+			"response": []
+		},
+		{
+			"name": "get-search",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3333/artists/search/query?q=dj",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"artists",
+						"search",
+						"query"
+					],
+					"query": [
+						{
+							"key": "q",
+							"value": "dj"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
