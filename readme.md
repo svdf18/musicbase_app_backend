@@ -31,7 +31,7 @@ npm start
 
 ## Links
 
-- [Deployed Backend](https://musicbase-app-backend.azurewebsites.net/)
+- [Deployed Backend](https://musicbase-app-backend-production.azurewebsites.net/)
 
 - [Deployed Frontend](https://svdf18.github.io/musicbase_app_frontend/)
 
