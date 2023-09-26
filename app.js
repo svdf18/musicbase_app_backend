@@ -14,7 +14,7 @@ app.use("/releases", releasesRouter);
 app.use("/tracks", tracksRouter);
 
 app.get("/", (req, res) => {
-  res.send("MMMMusicbase");
+  res.send("Musicbase");
 });
 
 app.listen(port, () => {
