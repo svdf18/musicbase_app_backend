@@ -1,0 +1,4 @@
+{
+  "appService.defaultWebAppToDeploy": "/subscriptions/cae1d16c-4c5b-4bc1-9a0c-e483e567ddb6/resourceGroups/appsvc_linux_centralus/providers/Microsoft.Web/sites/musicbase-app-backend",
+  "appService.deploySubpath": "."
+}
